@@ -1,0 +1,754 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scheme Speak</title>
+    <!-- Using Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <!-- Using FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        /* --- CSS Variables based on New Requirements --- */
+        :root {
+            /* Welcome Page */
+            --welcome-bg: #BAD0E7;
+            --welcome-text: #4C587D;
+
+            /* Home Page */
+            --home-bg: #B3CFE5; 
+            --dashboard-bg: #0A1931;
+            --dashboard-text: #B3CFE5;
+
+            /* Find Schemes Form Page */
+            --form-bg: #CED6CD;
+            --form-text: #222A35;
+
+            /* General UI */
+            --white: #ffffff;
+            --transition: 0.3s ease;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--home-bg);
+            color: var(--dashboard-text);
+            height: 100vh;
+            overflow: hidden; /* Manage scroll inside pages */
+        }
+
+        /* --- Page Router System --- */
+        .page {
+            display: none; /* Hidden by default */
+            height: 100%;
+            width: 100%;
+            flex-direction: column;
+            position: absolute;
+            top: 0;
+            left: 0;
+            overflow-y: auto;
+            animation: fadeIn 0.4s ease-in-out;
+            padding-top: 60px; /* Space for Navbar */
+        }
+
+        .page.active {
+            display: flex;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        /* --- 1. Welcome Page --- */
+        #welcome-screen {
+            z-index: 1000;
+            background-color: var(--welcome-bg);
+            justify-content: center;
+            align-items: center;
+            color: var(--welcome-text);
+            padding-top: 0; /* Full screen without navbar */
+        }
+
+        .welcome-title {
+            font-size: 3.5rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+        }
+
+        /* --- Navigation Bar --- */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 60px;
+            background-color: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(5px);
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+            z-index: 500;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .nav-btn {
+            background-color: var(--dashboard-bg);
+            color: var(--white);
+            border: none;
+            padding: 8px 16px;
+            margin-right: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 600;
+            transition: background 0.2s;
+        }
+
+        .nav-btn:hover {
+            opacity: 0.9;
+        }
+
+        .nav-btn:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+
+        /* --- 2. Home Page --- */
+        #home-page {
+            background-color: var(--home-bg);
+            justify-content: center;
+            align-items: center;
+            padding: 80px 20px 20px 20px;
+        }
+
+        .dashboard-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 30px;
+            flex-wrap: wrap;
+            width: 100%;
+            max-width: 1200px;
+        }
+
+        .dashboard-card {
+            background-color: var(--dashboard-bg);
+            color: var(--dashboard-text);
+            width: 320px;
+            height: 400px;
+            border-radius: 15px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 30px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(10, 25, 49, 0.3);
+            transition: transform 0.3s;
+            cursor: pointer;
+        }
+
+        .dashboard-card:hover {
+            transform: translateY(-10px);
+        }
+
+        .dash-icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            color: var(--dashboard-text);
+        }
+
+        .dash-title {
+            font-size: 1.4rem;
+            font-weight: 700;
+            margin-bottom: 15px;
+            line-height: 1.4;
+        }
+
+        .start-btn {
+            margin-top: 30px;
+            padding: 12px 25px;
+            background-color: var(--dashboard-text); /* Light blue button on dark card */
+            color: var(--dashboard-bg);
+            border: none;
+            border-radius: 25px;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.2s;
+        }
+
+        .start-btn:hover {
+            background-color: var(--white);
+            color: var(--dashboard-bg);
+        }
+
+        /* --- 3. Find Government Schemes Form --- */
+        #find-schemes-page {
+            background-color: var(--form-bg);
+            color: var(--form-text);
+            align-items: center;
+            padding: 80px 20px 40px 20px;
+        }
+
+        .form-box {
+            background-color: rgba(255, 255, 255, 0.6);
+            padding: 40px;
+            border-radius: 12px;
+            width: 100%;
+            max-width: 500px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+        }
+
+        .form-box h2 {
+            margin-bottom: 25px;
+            text-align: center;
+            color: var(--form-text);
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .input-group input, .input-group select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            background: rgba(255,255,255,0.8);
+            color: var(--form-text);
+            font-size: 1rem;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 14px;
+            background-color: var(--dashboard-bg);
+            color: var(--white);
+            border: none;
+            border-radius: 6px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        /* --- Results Page (Suits User) --- */
+        #results-page {
+            background-color: var(--form-bg);
+            color: var(--form-text);
+            align-items: center;
+            padding: 80px 20px 40px 20px;
+        }
+
+        .result-item {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            width: 100%;
+            max-width: 700px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+            border-left: 5px solid var(--dashboard-bg);
+        }
+
+        .result-item h3 { color: var(--dashboard-bg); margin-bottom: 10px; }
+        .result-item p { margin-bottom: 5px; }
+
+        /* --- 5. Schemes List (100 Items) --- */
+        #schemes-list-page {
+            background-color: var(--home-bg);
+            padding: 80px 20px 40px 20px;
+            align-items: center;
+        }
+
+        .schemes-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+            width: 100%;
+            max-width: 1200px;
+        }
+
+        .scheme-card {
+            background-color: var(--dashboard-bg);
+            color: var(--dashboard-text);
+            padding: 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: transform 0.2s;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            height: 120px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .scheme-card:hover {
+            transform: scale(1.02);
+            background-color: #112240;
+        }
+
+        /* --- Scheme Detail Page --- */
+        #scheme-detail-page {
+            background-color: var(--home-bg);
+            padding: 80px 20px 40px 20px;
+            align-items: center;
+        }
+
+        .detail-container {
+            background-color: var(--white);
+            color: var(--form-text);
+            width: 100%;
+            max-width: 800px;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .detail-header {
+            background-color: var(--dashboard-bg);
+            color: var(--dashboard-text);
+            padding: 30px;
+            text-align: center;
+        }
+
+        .detail-body {
+            padding: 30px;
+        }
+
+        .detail-section {
+            margin-bottom: 25px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 15px;
+        }
+
+        .detail-section h4 { color: var(--dashboard-bg); margin-bottom: 10px; }
+
+        /* Eligibility Checker inside Detail Page */
+        .eligibility-checker {
+            background-color: #f4f4f4;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+
+        .offline-badge {
+            background-color: #28a745;
+            color: white;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            margin-left: 10px;
+            vertical-align: middle;
+        }
+
+        /* --- Banks Page --- */
+        #banks-page {
+            background-color: var(--home-bg);
+            padding: 80px 20px 40px 20px;
+            align-items: center;
+        }
+        .bank-item {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            width: 100%;
+            max-width: 600px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        .bank-icon {
+            width: 60px;
+            height: 60px;
+            background: var(--dashboard-bg);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .dashboard-container {
+                flex-direction: column;
+            }
+            .dashboard-card {
+                width: 100%;
+                height: auto;
+                min-height: 250px;
+            }
+            .welcome-title { font-size: 2.5rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <button class="nav-btn" onclick="goHome()"><i class="fas fa-home"></i> Home</button>
+        <button class="nav-btn" id="prev-btn" onclick="goPrevious()"><i class="fas fa-arrow-left"></i> Previous</button>
+        
+        <!-- Language Selector (Retained for completeness) -->
+        <div style="margin-left: auto;">
+            <select onchange="changeLanguage(this.value)" style="padding: 5px; border-radius: 4px;">
+                <option value="en">English</option>
+                <option value="hi">Hindi</option>
+                <option value="bn">Bengali</option>
+            </select>
+        </div>
+    </nav>
+
+    <!-- 1. Welcome Page -->
+    <section id="welcome-screen" class="page active" style="padding-top: 0;">
+        <h1 class="welcome-title">Scheme Speak</h1>
+    </section>
+
+    <!-- 2. Home Page -->
+    <section id="home-page" class="page">
+        <div class="dashboard-container">
+            <!-- Dashboard 1 -->
+            <div class="dashboard-card" onclick="navigate('find-schemes-page')">
+                <div class="dash-icon"><i class="fas fa-user-check"></i></div>
+                <h3 class="dash-title">Find Government Schemes for Me</h3>
+                <p style="opacity: 0.8;">Personalized recommendations based on your profile.</p>
+                <!-- Start Check Option inside the card as requested -->
+                <button class="start-btn" onclick="event.stopPropagation(); navigate('find-schemes-page')">Start Check</button>
+            </div>
+
+            <!-- Dashboard 2 -->
+            <div class="dashboard-card" onclick="navigate('schemes-list-page')">
+                <div class="dash-icon"><i class="fas fa-book-open"></i></div>
+                <h3 class="dash-title">Details of Government Schemes</h3>
+                <p style="opacity: 0.8;">Browse 100+ schemes available offline.</p>
+            </div>
+
+            <!-- Dashboard 3 -->
+            <div class="dashboard-card" onclick="navigate('banks-page')">
+                <div class="dash-icon"><i class="fas fa-university"></i></div>
+                <h3 class="dash-title">Banks and Bank Information</h3>
+                <p style="opacity: 0.8;">Find bank branches and contact details.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- 3. Find Schemes Form Page -->
+    <section id="find-schemes-page" class="page">
+        <div class="form-box">
+            <h2>Enter Your Details</h2>
+            <form onsubmit="handleFindSchemes(event)">
+                <div class="input-group">
+                    <label>Name</label>
+                    <input type="text" id="u-name" required placeholder="Your Full Name">
+                </div>
+                <div class="input-group">
+                    <label>Age</label>
+                    <input type="number" id="u-age" required placeholder="Years">
+                </div>
+                <div class="input-group">
+                    <label>Gender</label>
+                    <select id="u-gender" required>
+                        <option value="">Select</option>
+                        <option value="Male">Male</option>
+                        <option value="Female">Female</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label>Occupation</label>
+                    <select id="u-occupation" required>
+                        <option value="">Select</option>
+                        <option value="Student">Student</option>
+                        <option value="Farmer">Farmer</option>
+                        <option value="Business">Business</option>
+                        <option value="Senior Citizen">Senior Citizen</option>
+                        <option value="Women">Women</option>
+                    </select>
+                </div>
+                <button type="submit" class="submit-btn">Find Schemes</button>
+            </form>
+        </div>
+    </section>
+
+    <!-- 3b. Results Page -->
+    <section id="results-page" class="page">
+        <h2 style="margin-bottom: 20px;">Suits You Best</h2>
+        <div id="results-container" style="width: 100%; display: flex; flex-direction: column; align-items: center;">
+            <!-- Results injected here -->
+        </div>
+    </section>
+
+    <!-- 5. Schemes List Page (100 Items) -->
+    <section id="schemes-list-page" class="page">
+        <h2 style="margin-bottom: 20px; color: var(--dashboard-bg);">100 Government Schemes</h2>
+        <div class="schemes-grid" id="schemes-grid">
+            <!-- 100 items injected via JS -->
+        </div>
+    </section>
+
+    <!-- 5b. Scheme Detail Page -->
+    <section id="scheme-detail-page" class="page">
+        <div class="detail-container">
+            <div class="detail-header">
+                <h2 id="detail-title">Scheme Name</h2>
+                <span class="offline-badge"><i class="fas fa-wifi-slash"></i> Available Offline</span>
+            </div>
+            <div class="detail-body">
+                <div class="detail-section">
+                    <h4>Overview</h4>
+                    <p id="detail-desc">Description goes here.</p>
+                </div>
+                
+                <div class="detail-section">
+                    <h4>Profits/Benefits</h4>
+                    <p id="detail-profit">Financial benefits listed here.</p>
+                </div>
+
+                <!-- Requirement: User enters details here to know docs/eligibility -->
+                <div class="eligibility-checker">
+                    <h4 style="margin-bottom: 15px; color: var(--dashboard-bg);">Check Your Eligibility</h4>
+                    <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 10px;">
+                        <input type="number" id="chk-age" placeholder="Age" style="padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+                        <select id="chk-gender" style="padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+                            <option value="Male">Male</option>
+                            <option value="Female">Female</option>
+                        </select>
+                        <button onclick="checkDetailEligibility()" class="nav-btn" style="margin:0;">Check</button>
+                    </div>
+                    <div id="eligibility-result" style="display: none; margin-top: 15px; padding: 10px; background: #e8f5e9; border: 1px solid #c8e6c9; border-radius: 5px;">
+                        <p><strong>Eligibility:</strong> <span id="res-elig">Eligible</span></p>
+                        <p><strong>Documents Required:</strong> <span id="res-docs">Aadhar, PAN</span></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Banks Page -->
+    <section id="banks-page" class="page">
+        <h2 style="margin-bottom: 20px; color: var(--dashboard-bg);">Banks Information</h2>
+        <div id="banks-container"></div>
+    </section>
+
+    <script>
+        // --- 1. State & Data ---
+        const state = {
+            history: ['home-page'],
+            schemes: []
+        };
+
+        // --- 2. Initialization ---
+        window.onload = function() {
+            // Welcome Screen Timer
+            setTimeout(() => {
+                document.getElementById('welcome-screen').classList.remove('active');
+                document.getElementById('home-page').classList.add('active');
+            }, 3500); // 3.5 seconds
+
+            generateSchemes();
+            renderSchemesList();
+            renderBanks();
+            updateNavButtons();
+        };
+
+        // --- 3. Navigation Logic ---
+        function navigate(pageId) {
+            // Hide all pages
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            // Show target
+            document.getElementById(pageId).classList.add('active');
+            // Update history
+            state.history.push(pageId);
+            updateNavButtons();
+        }
+
+        function goHome() {
+            // Reset to home page, clear history
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.getElementById('home-page').classList.add('active');
+            state.history = ['home-page'];
+            updateNavButtons();
+        }
+
+        function goPrevious() {
+            if (state.history.length > 1) {
+                state.history.pop(); // Remove current
+                const prev = state.history[state.history.length - 1];
+                
+                document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+                document.getElementById(prev).classList.add('active');
+                updateNavButtons();
+            }
+        }
+
+        function updateNavButtons() {
+            const prevBtn = document.getElementById('prev-btn');
+            // Disable previous if at root
+            if (state.history.length <= 1) {
+                prevBtn.disabled = true;
+            } else {
+                prevBtn.disabled = false;
+            }
+        }
+
+        // --- 4. Data Generation (100 Schemes) ---
+        function generateSchemes() {
+            const categories = ['Student', 'Farmer', 'Business', 'Senior Citizen', 'Women', 'Health'];
+            const suffixes = ['Yojana', 'Scheme', 'Support', 'Aid', 'Kalyan', 'Mission'];
+
+            for (let i = 1; i <= 100; i++) {
+                const cat = categories[Math.floor(Math.random() * categories.length)];
+                const suff = suffixes[Math.floor(Math.random() * suffixes.length)];
+                
+                state.schemes.push({
+                    id: i,
+                    name: `${cat} ${suff} ${i}`,
+                    category: cat,
+                    desc: `This is a government initiative aimed at supporting the ${cat} community across the nation.`,
+                    profit: `Up to ₹${(Math.random() * 100000).toFixed(0)} financial aid.`,
+                    minAge: cat === 'Senior Citizen' ? 60 : 18,
+                    docs: "Aadhar Card, Income Certificate, Passport Size Photo."
+                });
+            }
+        }
+
+        // --- 5. Feature: Find Schemes Form Logic ---
+        function handleFindSchemes(e) {
+            e.preventDefault();
+            const occupation = document.getElementById('u-occupation').value;
+            const age = parseInt(document.getElementById('u-age').value);
+
+            // Simple filter logic
+            const matches = state.schemes.filter(s => {
+                // Match category OR age logic
+                const catMatch = s.category === occupation;
+                const ageMatch = s.category === 'Senior Citizen' && age >= 60; 
+                return catMatch || ageMatch;
+            });
+
+            displayMatches(matches);
+            navigate('results-page');
+        }
+
+        function displayMatches(matches) {
+            const container = document.getElementById('results-container');
+            container.innerHTML = '';
+
+            if (matches.length === 0) {
+                container.innerHTML = '<p>No exact matches found, but check the Details section for more options.</p>';
+                return;
+            }
+
+            matches.forEach(m => {
+                const div = document.createElement('div');
+                div.className = 'result-item';
+                div.innerHTML = `
+                    <h3>${m.name}</h3>
+                    <p><strong>Profit:</strong> ${m.profit}</p>
+                    <p><strong>Category:</strong> ${m.category}</p>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        // --- 6. Feature: 100 Schemes List ---
+        function renderSchemesList() {
+            const grid = document.getElementById('schemes-grid');
+            state.schemes.forEach(scheme => {
+                const card = document.createElement('div');
+                card.className = 'scheme-card';
+                card.innerText = scheme.name;
+                card.onclick = () => showSchemeDetail(scheme);
+                grid.appendChild(card);
+            });
+        }
+
+        // --- 7. Feature: Scheme Detail & Internal Eligibility Check ---
+        let currentScheme = null;
+
+        function showSchemeDetail(scheme) {
+            currentScheme = scheme;
+            document.getElementById('detail-title').innerText = scheme.name;
+            document.getElementById('detail-desc').innerText = scheme.desc;
+            document.getElementById('detail-profit').innerText = scheme.profit;
+            
+            // Reset checker
+            document.getElementById('eligibility-result').style.display = 'none';
+            document.getElementById('chk-age').value = '';
+            
+            navigate('scheme-detail-page');
+        }
+
+        function checkDetailEligibility() {
+            if (!currentScheme) return;
+
+            const age = parseInt(document.getElementById('chk-age').value);
+            const resultDiv = document.getElementById('eligibility-result');
+            const resElig = document.getElementById('res-elig');
+            const resDocs = document.getElementById('res-docs');
+
+            // Logic: Just a mock check based on age vs scheme min age
+            if (age >= currentScheme.minAge) {
+                resElig.innerText = "ELIGIBLE based on age.";
+                resElig.style.color = "green";
+                resDocs.innerText = currentScheme.docs;
+            } else {
+                resElig.innerText = "NOT ELIGIBLE (Age criteria not met).";
+                resElig.style.color = "red";
+                resDocs.innerText = "N/A";
+            }
+
+            resultDiv.style.display = 'block';
+        }
+
+        // --- 8. Banks Mock Data ---
+        function renderBanks() {
+            const banks = [
+                { name: "State Bank of India", icon: "SBI" },
+                { name: "Punjab National Bank", icon: "PNB" },
+                { name: "Bank of Baroda", icon: "BOB" },
+                { name: "Canara Bank", icon: "CNB" }
+            ];
+            const container = document.getElementById('banks-container');
+            banks.forEach(b => {
+                const div = document.createElement('div');
+                div.className = 'bank-item';
+                div.innerHTML = `
+                    <div class="bank-icon">${b.icon}</div>
+                    <div>
+                        <h4>${b.name}</h4>
+                        <p style="font-size:0.9rem; color:#666;">Customer Care: 1800-123-456</p>
+                    </div>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        // --- Language Placeholder ---
+        function changeLanguage(lang) {
+            alert("Language switched to " + lang + ". (This is a demo placeholder)");
+        }
+
+    </script>
+</body>
+</html>
