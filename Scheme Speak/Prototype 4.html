@@ -1,0 +1,950 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scheme Speak</title>
+    <style>
+        /* --- CSS Reset & Base Styles --- */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body, html {
+            width: 100%;
+            height: 100%;
+            overflow-x: hidden;
+        }
+
+        /* --- Utility Classes --- */
+        .hidden {
+            display: none !important;
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        button {
+            cursor: pointer;
+            border: none;
+            outline: none;
+            transition: transform 0.2s, opacity 0.2s;
+        }
+
+        button:active {
+            transform: scale(0.98);
+        }
+
+        input, select {
+            padding: 10px;
+            margin: 8px 0;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            width: 100%;
+        }
+
+        /* --- Navigation Bar --- */
+        #nav-controls {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 1000;
+            display: flex;
+            gap: 10px;
+        }
+
+        .nav-btn {
+            background-color: #0A1931;
+            color: #B3CFE5;
+            padding: 8px 16px;
+            border-radius: 4px;
+            font-weight: bold;
+            border: 1px solid #B3CFE5;
+        }
+
+        .nav-btn:hover {
+            background-color: #1c2f52;
+        }
+
+        /* --- 1. Welcome Page (Enhanced & Dynamic) --- */
+        #view-welcome {
+            width: 100vw;
+            height: 100vh;
+            background-color: #BAD0E7;
+            color: #4C587D;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 2000;
+            overflow: hidden;
+        }
+
+        /* Background floating shapes for dynamism */
+        .bg-shape {
+            position: absolute;
+            border-radius: 50%;
+            opacity: 0.1;
+            background: #0A1931;
+            animation: float 6s infinite ease-in-out;
+        }
+
+        .shape-1 { width: 100px; height: 100px; top: 10%; left: 10%; animation-delay: 0s; }
+        .shape-2 { width: 150px; height: 150px; bottom: 15%; right: 10%; animation-delay: 2s; }
+        .shape-3 { width: 60px; height: 60px; top: 20%; right: 20%; animation-delay: 1s; }
+        .shape-4 { width: 80px; height: 80px; bottom: 20%; left: 20%; animation-delay: 3s; }
+
+        @keyframes float {
+            0% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(5deg); }
+            100% { transform: translateY(0px) rotate(0deg); }
+        }
+
+        .welcome-content {
+            text-align: center;
+            z-index: 1;
+            padding: 0 20px;
+        }
+
+        .app-title {
+            font-size: 3.5rem;
+            font-weight: 800;
+            margin-bottom: 10px;
+            opacity: 0;
+            animation: slideUpFade 0.8s forwards 0.2s;
+        }
+
+        .welcome-line {
+            font-size: 1.2rem;
+            font-weight: 500;
+            margin-bottom: 30px;
+            opacity: 0;
+            animation: slideUpFade 0.8s forwards 0.6s;
+        }
+
+        .welcome-sub {
+            font-size: 1rem;
+            font-style: italic;
+            opacity: 0;
+            animation: slideUpFade 0.8s forwards 1.0s;
+        }
+
+        /* Progress Bar Container */
+        .loader-container {
+            width: 200px;
+            height: 4px;
+            background: rgba(76, 88, 125, 0.2);
+            border-radius: 2px;
+            margin-top: 40px;
+            overflow: hidden;
+            opacity: 0;
+            animation: slideUpFade 0.8s forwards 1.2s;
+        }
+
+        /* The Filling Bar */
+        .loader-bar {
+            height: 100%;
+            background: #4C587D;
+            width: 0%;
+            border-radius: 2px;
+            /* Duration matches the JS setTimeout */
+            animation: fillBar 3.5s linear forwards;
+        }
+
+        @keyframes slideUpFade {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes fillBar {
+            0% { width: 0%; }
+            100% { width: 100%; }
+        }
+
+        /* --- 2. Home Page --- */
+        #view-home {
+            background-color: #B3CFE5;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .dashboard-container {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            justify-content: center;
+            width: 100%;
+            max-width: 1200px;
+        }
+
+        .dashboard-card {
+            background-color: #0A1931;
+            color: #B3CFE5;
+            width: 300px;
+            height: 250px;
+            border-radius: 10px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 20px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .dashboard-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 16px rgba(0,0,0,0.3);
+        }
+
+        .dashboard-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+
+        .start-option {
+            margin-top: 15px;
+            padding: 8px 20px;
+            background-color: #B3CFE5;
+            color: #0A1931;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: bold;
+            border: 2px solid #B3CFE5;
+        }
+
+        .start-option:hover {
+            background-color: transparent;
+            color: #B3CFE5;
+        }
+
+        /* --- 3. Find Government Schemes (Form) --- */
+        #view-scheme-finder-form {
+            background-color: #CED6CD;
+            color: #222A35;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .form-box {
+            background: white;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 500px;
+        }
+
+        .form-box h2 {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .submit-btn {
+            background-color: #0A1931;
+            color: #B3CFE5;
+            padding: 12px;
+            width: 100%;
+            border-radius: 5px;
+            margin-top: 10px;
+            font-size: 1rem;
+        }
+
+        /* --- 3b. Find Schemes Results --- */
+        #view-scheme-finder-results {
+            background-color: #CED6CD;
+            color: #222A35;
+            min-height: 100vh;
+            padding: 80px 20px 20px 20px;
+        }
+
+        .results-container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .scheme-card {
+            background: white;
+            margin-bottom: 20px;
+            padding: 20px;
+            border-radius: 8px;
+            border-left: 5px solid #0A1931;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        .scheme-card h3 {
+            color: #0A1931;
+            margin-bottom: 10px;
+        }
+
+        .scheme-card p {
+            margin-bottom: 5px;
+            line-height: 1.5;
+        }
+
+        .tag {
+            display: inline-block;
+            background: #BAD0E7;
+            color: #0A1931;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            margin-right: 5px;
+            margin-bottom: 5px;
+        }
+
+        /* --- 4. Details of Government Schemes (List & Detail) --- */
+        #view-scheme-list {
+            background-color: #B3CFE5;
+            min-height: 100vh;
+            padding: 80px 20px 20px 20px;
+        }
+
+        .scheme-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 15px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .scheme-item {
+            background-color: #0A1931;
+            color: #B3CFE5;
+            padding: 15px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .scheme-item:hover {
+            background-color: #152541;
+        }
+
+        /* --- 4b. Single Scheme Detail --- */
+        #view-scheme-detail {
+            background-color: #B3CFE5;
+            color: #0A1931;
+            min-height: 100vh;
+            padding: 80px 20px 20px 20px;
+        }
+
+        .detail-container {
+            background: white;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .detail-header {
+            border-bottom: 2px solid #B3CFE5;
+            padding-bottom: 15px;
+            margin-bottom: 20px;
+        }
+
+        .detail-section {
+            margin-bottom: 20px;
+            background: #f9f9f9;
+            padding: 15px;
+            border-radius: 5px;
+        }
+
+        .eligibility-check-box {
+            background: #CED6CD;
+            padding: 15px;
+            margin-top: 20px;
+            border-radius: 5px;
+        }
+
+        /* --- 5. Banks and Bank Information --- */
+        #view-banks {
+            background-color: #B3CFE5;
+            min-height: 100vh;
+            padding: 80px 20px 20px 20px;
+        }
+
+        .bank-list {
+            max-width: 1000px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .bank-card {
+            background: white;
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .bank-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+        }
+
+        .bank-header h2 {
+            color: #0A1931;
+        }
+
+        .bank-details-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .pros-cons ul {
+            padding-left: 20px;
+            margin-top: 5px;
+        }
+
+        .pros {
+            color: green;
+        }
+
+        .cons {
+            color: #c0392b;
+        }
+
+        /* Mobile Adjustments */
+        @media (max-width: 768px) {
+            .dashboard-container {
+                flex-direction: column;
+                align-items: center;
+            }
+            .bank-details-grid {
+                grid-template-columns: 1fr;
+            }
+            .app-title {
+                font-size: 2.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Navigation Controls (Fixed Top Left) -->
+    <div id="nav-controls" class="hidden">
+        <button class="nav-btn" onclick="goHome()">Home</button>
+        <button class="nav-btn" onclick="goBack()">Previous</button>
+    </div>
+
+    <!-- 1. Welcome Page (Enhanced with Dynamism) -->
+    <div id="view-welcome">
+        <!-- Dynamic Background Shapes -->
+        <div class="bg-shape shape-1"></div>
+        <div class="bg-shape shape-2"></div>
+        <div class="bg-shape shape-3"></div>
+        <div class="bg-shape shape-4"></div>
+
+        <div class="welcome-content">
+            <div class="app-title">Scheme Speak</div>
+            <div class="welcome-line">Your Gateway to Government Benefits</div>
+            <div class="welcome-sub">Empowering Citizens • Connecting Banks • Simplifying Lives</div>
+            
+            <!-- Loader Bar -->
+            <div class="loader-container">
+                <div class="loader-bar"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 2. Home Page -->
+    <div id="view-home" class="hidden fade-in">
+        <h1 style="color: #0A1931; margin-bottom: 40px;">Welcome to Scheme Speak</h1>
+        <div class="dashboard-container">
+            
+            <!-- Dashboard 1 -->
+            <div class="dashboard-card" onclick="navigateTo('view-scheme-finder-form')">
+                <div class="dashboard-title">Find Government Schemes for Me</div>
+                <p>Discover schemes tailored to your profile.</p>
+                <button class="start-option">Start Check</button>
+            </div>
+
+            <!-- Dashboard 2 -->
+            <div class="dashboard-card" onclick="navigateTo('view-scheme-list')">
+                <div class="dashboard-title">Details of Government Schemes</div>
+                <p>Browse 100+ government schemes.</p>
+                <button class="start-option">Browse</button>
+            </div>
+
+            <!-- Dashboard 3 -->
+            <div class="dashboard-card" onclick="navigateTo('view-banks')">
+                <div class="dashboard-title">Banks and Bank Information</div>
+                <p>Top 10 banks of India and their details.</p>
+                <button class="start-option">View Banks</button>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- 3. Find Schemes Form -->
+    <div id="view-scheme-finder-form" class="hidden fade-in">
+        <div class="form-box">
+            <h2>Enter Your Details</h2>
+            <form id="finderForm" onsubmit="handleSchemeFinder(event)">
+                <label>Name</label>
+                <input type="text" id="finderName" required placeholder="Full Name">
+                
+                <label>Age</label>
+                <input type="number" id="finderAge" required placeholder="Age in years">
+                
+                <label>Gender</label>
+                <select id="finderGender">
+                    <option value="Male">Male</option>
+                    <option value="Female">Female</option>
+                    <option value="Other">Other</option>
+                </select>
+                
+                <label>Occupation</label>
+                <select id="finderOccupation">
+                    <option value="Student">Student</option>
+                    <option value="Farmer">Farmer</option>
+                    <option value="Business">Business Owner</option>
+                    <option value="Employed">Employed (Salaried)</option>
+                    <option value="Senior Citizen">Senior Citizen (Retired)</option>
+                    <option value="Women">Women (Homemaker/Self-Employed)</option>
+                </select>
+                
+                <button type="submit" class="submit-btn">Find Schemes</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- 3b. Find Schemes Results -->
+    <div id="view-scheme-finder-results" class="hidden fade-in">
+        <h2 style="margin-bottom: 20px;">Suggested Schemes for You</h2>
+        <div id="resultsContent" class="results-container">
+            <!-- Results injected via JS -->
+        </div>
+    </div>
+
+    <!-- 4. All Schemes List -->
+    <div id="view-scheme-list" class="hidden fade-in">
+        <h2 style="color: #0A1931; margin-bottom: 20px; text-align: center;">All Government Schemes (100)</h2>
+        <div id="schemesListContainer" class="scheme-grid">
+            <!-- List items injected via JS -->
+        </div>
+    </div>
+
+    <!-- 4b. Single Scheme Detail -->
+    <div id="view-scheme-detail" class="hidden fade-in">
+        <div id="schemeDetailContent" class="detail-container">
+            <!-- Details injected via JS -->
+        </div>
+    </div>
+
+    <!-- 5. Banks Information -->
+    <div id="view-banks" class="hidden fade-in">
+        <h2 style="color: #0A1931; margin-bottom: 30px; text-align: center;">Top 10 Banks of India</h2>
+        <div id="banksContainer" class="bank-list">
+            <!-- Banks injected via JS -->
+        </div>
+    </div>
+
+    <script>
+        // --- State Management ---
+        const viewStack = ['view-home']; // Stack to handle "Previous" button
+        let currentView = 'view-welcome';
+
+        // --- Data Mocking ---
+
+        // Helper to generate 100 schemes
+        const generateSchemes = () => {
+            const schemes = [];
+            const prefixes = ["National", "State", "Central", "Pradhan Mantri", "Gramin", "Shiksha", "Swasthya", "Kisan", "Mahila", "Udyog"];
+            const suffixes = ["Yojana", "Scheme", "Mission", "Aayog", "Plan", "Suraksha", "Vikas", "Protsahan", "Sahayata", "Kalyan"];
+            
+            for(let i = 1; i <= 100; i++) {
+                const prefix = prefixes[Math.floor(Math.random() * prefixes.length)];
+                const suffix = suffixes[Math.floor(Math.random() * suffixes.length)];
+                schemes.push({
+                    id: i,
+                    name: `${prefix} ${suffix} ${i}`,
+                    purpose: `To provide ${prefix.toLowerCase()} benefits for the development of sector ${i}.`,
+                    eligibility: "Citizens of India meeting specific income and age criteria.",
+                    documents: "Aadhar Card, PAN Card, Address Proof, Income Certificate.",
+                    profits: "Financial aid, subsidies, or insurance coverage up to ₹1,00,000."
+                });
+            }
+            return schemes;
+        };
+
+        const allSchemes = generateSchemes();
+
+        const topBanks = [
+            {
+                name: "State Bank of India (SBI)",
+                rank: 1,
+                features: "Largest network, government-backed, wide range of products.",
+                suggestion: "Best for stable savings and extensive branch access.",
+                pros: ["High trust", "Low fees on basic accounts", "Huge ATM network"],
+                cons: ["Slow customer service", "Legacy IT systems", "Strict paperwork"]
+            },
+            {
+                name: "HDFC Bank",
+                rank: 2,
+                features: "Private sector leader, excellent digital banking, quick service.",
+                suggestion: "Ideal for tech-savvy users and premium banking experience.",
+                pros: ["Best mobile app", "Fast loan processing", "Good customer support"],
+                cons: ["Higher minimum balance requirements", "Penalties on minor defaults"]
+            },
+            {
+                name: "ICICI Bank",
+                rank: 3,
+                features: "Innovative digital solutions, strong corporate banking.",
+                suggestion: "Great for digital-first customers and NRI services.",
+                pros: ["Internet banking features", "Wide ATM network", "Quick account opening"],
+                cons: ["Similar to HDFC in fees", "Complex fee structure"]
+            },
+            {
+                name: "Axis Bank",
+                rank: 4,
+                features: "Good customer service, attractive credit card rewards.",
+                suggestion: "Suitable for urban professionals looking for rewards.",
+                pros: ["Good loyalty program", "Responsive support", "Modern infrastructure"],
+                cons: ["Lower rural penetration", "Interest rates vary"]
+            },
+            {
+                name: "Kotak Mahindra Bank",
+                rank: 5,
+                features: "Known for 811 savings account, competitive interest rates.",
+                suggestion: "Best for high-interest savings and zero-balance accounts.",
+                pros: ["High interest on savings", "User-friendly app", "Zero balance options"],
+                cons: ["Fewer physical branches compared to SBI", "Newer player"]
+            },
+            {
+                name: "Punjab National Bank (PNB)",
+                rank: 6,
+                features: "Nationalized bank, strong in Northern India.",
+                suggestion: "Good for government employees and rural sectors.",
+                pros: ["Government safety", "Lower service charges", "PSB reach"],
+                cons: ["Technological lag", "NPA issues affecting efficiency"]
+            },
+            {
+                name: "Bank of Baroda",
+                rank: 7,
+                features: "International presence, strong MSME focus.",
+                suggestion: "Good for businesses looking for expansion loans.",
+                pros: ["Good for NRI", "Competitive loan rates", "Wide global reach"],
+                cons: ["Slower tech adoption", "Bureaucratic hurdles"]
+            },
+            {
+                name: "Canara Bank",
+                rank: 8,
+                features: "Old nationalized bank, focus on agriculture and rural.",
+                suggestion: "Best for farmers and rural development loans.",
+                pros: ["Strong rural base", "Government schemes integration", "Stable"],
+                cons: ["Outdated UI", "Slower processing"]
+            },
+            {
+                name: "Union Bank of India",
+                rank: 9,
+                features: "Merger of several banks, large customer base.",
+                suggestion: "Reliable for standard banking needs.",
+                pros: ["Large network post-merger", "Government-backed"],
+                cons: ["Integration challenges", "Average service"]
+            },
+            {
+                name: "IndusInd Bank",
+                rank: 10,
+                features: "Specialized in NRI and commercial vehicle loans.",
+                suggestion: "Good for niche loans and distinctive credit cards.",
+                pros: ["Niche products", "Good customer service", "24/7 support"],
+                cons: ["Limited branches", "Higher charges on some services"]
+            }
+        ];
+
+        // --- Initialization ---
+
+        window.onload = function() {
+            // Start Welcome Timer (Matches CSS animation duration)
+            setTimeout(() => {
+                document.getElementById('view-welcome').classList.add('hidden');
+                navigateTo('view-home', false); // false = don't push to stack yet, we reset stack
+                viewStack = ['view-home']; // Reset stack to fresh home state
+                updateNavVisibility();
+            }, 3500); // 3.5 seconds
+        };
+
+        // --- Navigation Logic ---
+
+        function updateNavVisibility() {
+            const nav = document.getElementById('nav-controls');
+            if (currentView === 'view-welcome') {
+                nav.classList.add('hidden');
+            } else {
+                nav.classList.remove('hidden');
+            }
+        }
+
+        function navigateTo(viewId, pushToStack = true) {
+            // Hide current view
+            const currentEl = document.getElementById(currentView);
+            if (currentEl) currentEl.classList.add('hidden');
+
+            // Show new view
+            const newEl = document.getElementById(viewId);
+            if (newEl) {
+                newEl.classList.remove('hidden');
+                // Retrigger animation
+                newEl.classList.remove('fade-in');
+                void newEl.offsetWidth; // trigger reflow
+                newEl.classList.add('fade-in');
+            }
+
+            // Update Stack
+            if (pushToStack) {
+                viewStack.push(viewId);
+            }
+
+            currentView = viewId;
+            updateNavVisibility();
+            window.scrollTo(0,0);
+
+            // Specific init for views
+            if (viewId === 'view-scheme-list') renderSchemeList();
+            if (viewId === 'view-banks') renderBanks();
+        }
+
+        function goBack() {
+            if (viewStack.length > 1) {
+                // Remove current
+                viewStack.pop();
+                // Get previous
+                const previousViewId = viewStack[viewStack.length - 1];
+                
+                // We want to "go back", so we navigate without pushing again.
+                // Temporarily modify navigateTo behavior or just manually handle swapping
+                // Let's manually swap to avoid complexity with the stack logic inside navigateTo
+                
+                const currentEl = document.getElementById(currentView);
+                currentEl.classList.add('hidden');
+
+                const prevEl = document.getElementById(previousViewId);
+                prevEl.classList.remove('hidden');
+                
+                currentView = previousViewId;
+                updateNavVisibility();
+                window.scrollTo(0,0);
+            }
+        }
+
+        function goHome() {
+            // Reset stack to just home
+            document.getElementById(currentView).classList.add('hidden');
+            document.getElementById('view-home').classList.remove('hidden');
+            viewStack = ['view-home'];
+            currentView = 'view-home';
+            updateNavVisibility();
+            window.scrollTo(0,0);
+        }
+
+        // --- Feature 3 Logic: Find Schemes ---
+
+        function handleSchemeFinder(e) {
+            e.preventDefault();
+            
+            const age = parseInt(document.getElementById('finderAge').value);
+            const occupation = document.getElementById('finderOccupation').value;
+            const gender = document.getElementById('finderGender').value;
+
+            // Logic to filter schemes (Simulated)
+            let matchedSchemes = [];
+
+            // Simple logic to generate "relevant" results based on occupation
+            // In a real app, this would query a database.
+            
+            if (occupation === 'Student') {
+                matchedSchemes.push({ name: "National Scholarship Portal", purpose: "Financial support for education", eligibility: "Students with >75% marks", documents: "Mark sheets, Income proof", profits: "Up to ₹50,000/year" });
+                matchedSchemes.push({ name: "Skill India Mission", purpose: "Vocational training", eligibility: "Age 18-35", documents: "Aadhar, Education Cert", profits: "Certification and stipend" });
+            } else if (occupation === 'Farmer') {
+                matchedSchemes.push({ name: "PM Kisan Samman Nidhi", purpose: "Income support for farmers", eligibility: "Landholding farmers", documents: "Land records, Aadhar", profits: "₹6,000 per year" });
+                matchedSchemes.push({ name: "Kisan Credit Card (KCC)", purpose: "Credit for cultivation", eligibility: "Farmers with crop land", documents: "Land proof, ID", profits: "Low interest loans" });
+            } else if (occupation === 'Women') {
+                matchedSchemes.push({ name: "Mahila Samridhi Yojana", purpose: "Women empowerment", eligibility: "Women aged 18-60", documents: "ID proof, Address proof", profits: "Savings with interest" });
+            } else if (occupation === 'Senior Citizen') {
+                matchedSchemes.push({ name: "Pradhan Mantri Vaya Vandana Yojana", purpose: "Pension income", eligibility: "60+ years", documents: "Age proof, Bank details", profits: "8% pension return" });
+            } else {
+                // Generic schemes for Business/Employed
+                matchedSchemes.push({ name: "Mudra Yojana", purpose: "Loans for micro enterprises", eligibility: "Indian citizen", documents: "Business plan, ID", profits: "Loans up to ₹10 Lakhs" });
+                matchedSchemes.push({ name: "Pradhan Mantri Awas Yojana", purpose: "Housing for all", eligibility: "Income group based", documents: "Income certificate, Aadhar", profits: "Interest subsidy on home loans" });
+            }
+
+            // Add 1 random scheme from the main list
+            matchedSchemes.push(allSchemes[Math.floor(Math.random() * allSchemes.length)]);
+
+            renderFinderResults(matchedSchemes);
+            navigateTo('view-scheme-finder-results');
+        }
+
+        function renderFinderResults(schemes) {
+            const container = document.getElementById('resultsContent');
+            container.innerHTML = '';
+
+            if (schemes.length === 0) {
+                container.innerHTML = '<p>No specific schemes found. Try different details.</p>';
+                return;
+            }
+
+            schemes.forEach(scheme => {
+                const div = document.createElement('div');
+                div.className = 'scheme-card';
+                div.innerHTML = `
+                    <h3>${scheme.name}</h3>
+                    <div style="margin: 10px 0;">
+                        <span class="tag">Purpose</span>
+                        <span class="tag">Profits</span>
+                    </div>
+                    <p><strong>Purpose:</strong> ${scheme.purpose}</p>
+                    <p><strong>Eligibility:</strong> ${scheme.eligibility}</p>
+                    <p><strong>Documents:</strong> ${scheme.documents}</p>
+                    <p><strong>Profits:</strong> ${scheme.profits}</p>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        // --- Feature 4 Logic: Scheme List & Details ---
+
+        function renderSchemeList() {
+            const container = document.getElementById('schemesListContainer');
+            if (container.children.length > 0) return; // Already rendered
+
+            allSchemes.forEach(scheme => {
+                const div = document.createElement('div');
+                div.className = 'scheme-item';
+                div.textContent = `${scheme.id}. ${scheme.name}`;
+                div.onclick = () => openSchemeDetail(scheme);
+                container.appendChild(div);
+            });
+        }
+
+        function openSchemeDetail(scheme) {
+            const container = document.getElementById('schemeDetailContent');
+            container.innerHTML = `
+                <div class="detail-header">
+                    <h1>${scheme.name}</h1>
+                    <p>Government of India Initiative</p>
+                </div>
+
+                <div class="detail-section">
+                    <h3>Purpose</h3>
+                    <p>${scheme.purpose}</p>
+                </div>
+
+                <div class="detail-section">
+                    <h3>General Eligibility</h3>
+                    <p>${scheme.eligibility}</p>
+                </div>
+
+                <div class="detail-section">
+                    <h3>General Benefits</h3>
+                    <p>${scheme.profits}</p>
+                </div>
+
+                <div class="eligibility-check-box">
+                    <h3>Check Specific Eligibility & Documents</h3>
+                    <p style="font-size: 0.9rem; margin-bottom: 10px;">Enter your details to confirm exact requirements for you.</p>
+                    <input type="text" id="detailName" placeholder="Name" style="background: white;">
+                    <input type="number" id="detailAge" placeholder="Age" style="background: white;">
+                    <button class="submit-btn" onclick="checkSchemeEligibility()">Check Now</button>
+                    
+                    <div id="documentResult" style="margin-top: 15px; display: none; border-top: 1px solid #aaa; padding-top: 10px;">
+                        <strong>Required Documents for you:</strong>
+                        <p style="color: green; font-weight: bold;">${scheme.documents}</p>
+                        <p style="font-size: 0.9rem;">You are eligible based on your profile.</p>
+                    </div>
+                </div>
+            `;
+            navigateTo('view-scheme-detail');
+        }
+
+        function checkSchemeEligibility() {
+            const name = document.getElementById('detailName').value;
+            const age = document.getElementById('detailAge').value;
+
+            if(!name || !age) {
+                // Using a simple text feedback instead of alert
+                const btn = document.querySelector('.eligibility-check-box button');
+                btn.textContent = "Please fill details first";
+                setTimeout(() => btn.textContent = "Check Now", 2000);
+                return;
+            }
+
+            document.getElementById('documentResult').style.display = 'block';
+        }
+
+        // --- Feature 5 Logic: Banks ---
+
+        function renderBanks() {
+            const container = document.getElementById('banksContainer');
+            if (container.children.length > 0) return; // Already rendered
+
+            topBanks.forEach(bank => {
+                const div = document.createElement('div');
+                div.className = 'bank-card';
+                
+                // Build Pros and Cons lists
+                const prosHtml = bank.pros.map(p => `<li>${p}</li>`).join('');
+                const consHtml = bank.cons.map(c => `<li>${c}</li>`).join('');
+
+                div.innerHTML = `
+                    <div class="bank-header">
+                        <h2>#${bank.rank} ${bank.name}</h2>
+                    </div>
+                    <div class="bank-details-grid">
+                        <div>
+                            <h4>Key Features</h4>
+                            <p>${bank.features}</p>
+                            
+                            <h4 style="margin-top: 15px;">Suggestion</h4>
+                            <p><em>${bank.suggestion}</em></p>
+                        </div>
+                        <div class="pros-cons">
+                            <div class="pros">
+                                <h4>Advantages</h4>
+                                <ul>${prosHtml}</ul>
+                            </div>
+                            <div class="cons" style="margin-top: 15px;">
+                                <h4>Disadvantages</h4>
+                                <ul>${consHtml}</ul>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+    </script>
+</body>
+</html>
